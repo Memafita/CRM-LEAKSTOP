@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🚀 Leak Stop - Central de Comando</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #141414;
+            --border: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-yellow: #f59e0b;
+            --accent-red: #dc2626;
+            --accent-purple: #8b5cf6;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 25px 0;
+            border-bottom: 2px solid var(--accent-green);
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 1.6em;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            padding: 5px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 8px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.75em;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab.active {
+            background: var(--accent-green);
+            color: #000;
+        }
+        
+        /* Tab Content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+        
+        .card-title {
+            font-size: 1em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), #16a34a);
+            color: #000;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 0.8em;
+        }
+        
+        /* Inputs */
+        .input-group {
+            margin-bottom: 14px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 0.9em;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+        
+        /* Scripts */
+        .script-box {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            position: relative;
+        }
+        
+        .script-text {
+            font-size: 0.85em;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            cursor: pointer;
+        }
+        
+        .script-text:active {
+            color: var(--accent-green);
+        }
+        
+        .copy-hint {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            font-size: 0.7em;
+            color: var(--accent-green);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .script-box:hover .copy-hint,
+        .script-box:active .copy-hint {
+            opacity: 1;
+        }
+        
+        /* Client List */
+        .client-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .client-info {
+            flex: 1;
+        }
+        
+        .client-name {
+            font-weight: 600;
+            font-size: 0.95em;
+            margin-bottom: 2px;
+        }
+        
+        .client-meta {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+        }
+        
+        .client-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .status-new { background: var(--accent-blue); color: #fff; }
+        .status-contacted { background: var(--accent-yellow); color: #000; }
+        .status-client { background: var(--accent-green); color: #000; }
+        .status-lost { background: var(--accent-red); color: #fff; }
+        
+        /* Roadmap */
+        .roadmap-day {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+        
+        .day-number {
+            background: var(--accent-green);
+            color: #000;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+        
+        .day-number.weekend {
+            background: var(--accent-purple);
+        }
+        
+        .day-content {
+            flex: 1;
+        }
+        
+        .day-title {
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+        
+        .day-tasks {
+            list-style: none;
+        }
+        
+        .day-tasks li {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            padding: 3px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .day-tasks li::before {
+            content: '□';
+            color: var(--accent-green);
+        }
+        
+        .day-tasks li.done::before {
+            content: '☑';
+        }
+        
+        .day-tasks li.done {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+        
+        /* Website Templates */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+        }
+        
+        .template-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .template-card:active {
+            border-color: var(--accent-green);
+            transform: scale(0.98);
+        }
+        
+        .template-icon {
+            font-size: 2em;
+            margin-bottom: 6px;
+        }
+        
+        .template-name {
+            font-weight: 600;
+            font-size: 0.8em;
+            margin-bottom: 4px;
+        }
+        
+        .template-desc {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+        }
+        
+        /* Website Preview */
+        .website-preview {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 14px 0;
+            color: #000;
+        }
+        
+        .website-preview h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .website-preview p {
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        
+        .website-preview .cta-button {
+            display: inline-block;
+            background: #25d366;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        /* Tips */
+        .tip-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-green);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+            margin: 16px 0;
+        }
+        
+        .tip-box strong {
+            color: var(--accent-green);
+        }
+        
+        .tip-box p {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-top: 4px;
+        }
+        
+        /* Progress */
+        .progress-bar {
+            background: var(--bg-primary);
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 12px;
+        }
+        
+        .section-header h2 {
+            font-size: 1.1em;
+            color: var(--accent-green);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state .icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.1em;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .template-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav-tab {
+                font-size: 0.7em;
+                padding: 10px 6px;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9em;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        /* Search Box */
+        .search-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        
+        .search-container input {
+            flex: 1;
+        }
+        
+        /* Filter Tags */
+        .filter-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        
+        .filter-tag {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        
+        .filter-tag.active {
+            background: var(--accent-green);
+            color: #000;
+            border-color: var(--accent-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 Leak Stop - Central de Comando</h1>
+            <p>Seu negócio de IA começa AGORA</p>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="statProspects">0</div>
+                <div class="stat-label">Prospectados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statContacted">0</div>
+                <div class="stat-label">Contatados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statClients">0</div>
+                <div class="stat-label">Clientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statRevenue">R$0</div>
+                <div class="stat-label">Receita</div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('prospects')">📋 Prospectar</div>
+            <div class="nav-tab" onclick="switchTab('scripts')">💬 Scripts</div>
+            <div class="nav-tab" onclick="switchTab('templates')">🌐 Sites</div>
+            <div class="nav-tab" onclick="switchTab('roadmap')">📅 30 Dias</div>
+        </div>
+        
+        <!-- Tab 1: Prospects -->
+        <div id="prospects" class="tab-content active">
+            <div class="card">
+                <div class="card-title">📋 Adicionar Novo Alvo</div>
+                <div class="search-container">
+                    <input type="text" id="prospectName" placeholder="Nome do negócio...">
+                    <button class="btn btn-primary" onclick="addProspect()">+</button>
+                </div>
+                <div class="input-group">
+                    <label>WhatsApp / Telefone</label>
+                    <input type="tel" id="prospectPhone" placeholder="(11) 99999-9999">
+                </div>
+                <div class="input-group">
+                    <label>Nicho</label>
+                    <select id="prospectNiche">
+                        <option value="restaurante">🍕 Restaurante / Lanchonete</option>
+                        <option value="beleza">💇 Salão / Barbearia</option>
+                        <option value="pet">🐾 Pet Shop</option>
+                        <option value="fitness">🏋️ Academia</option>
+                        <option value="loja">👗 Loja de Roupas</option>
+                        <option value="construcao">🔨 Material de Construção</option>
+                        <option value="saude">🏥 Clínica / Consultório</option>
+                        <option value="outro">📦 Outro</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Observações</label>
+                    <textarea id="prospectNotes" rows="2" placeholder="Ex: Instagram desatualizado, sem site..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="addProspect()" style="width: 100%;">💾 Salvar Alvo</button>
+            </div>
+            
+            <div class="filter-tags">
+                <div class="filter-tag active" onclick="filterProspects('all')">Todos</div>
+                <div class="filter-tag" onclick="filterProspects('new')">🆕 Novos</div>
+                <div class="filter-tag" onclick="filterProspects('contacted')">📱 Contatados</div>
+                <div class="filter-tag" onclick="filterProspects('client')">✅ Clientes</div>
+            </div>
+            
+            <div id="prospectList">
+                <div class="empty-state">
+                    <div class="icon">📋</div>
+                    <p>Nenhum alvo ainda. Adicione seu primeiro negócio!</p>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <strong>💡 Dica de Ouro:</strong>
+                <p>Use o Google Maps + Instagram para encontrar 20-30 negócios no seu bairro com presença digital fraca. Adicione todos aqui e mande mensagens usando os scripts da aba "💬 Scripts".</p>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Scripts -->
+        <div id="scripts" class="tab-content">
+            <div class="section-header">
+                <h2>💬 Scripts de Abordagem</h2>
+            </div>
+            
+            <div class="filter-tags">
+                <div class="filter-tag active" onclick="filterScripts('all')">Todos</div>
+                <div class="filter-tag" onclick="filterScripts('restaurante')">🍕 Restaurantes</div>
+                <div class="filter-tag" onclick="filterScripts('beleza')">💇 Beleza</div>
+                <div class="filter-tag" onclick="filterScripts('pet')">🐾 Pet</div>
+                <div class="filter-tag" onclick="filterScripts('fitness')">🏋️ Fitness</div>
+                <div class="filter-tag" onclick="filterScripts('site')">🌐 Sites</div>
+            </div>
+            
+            <!-- First Contact Scripts -->
+            <div class="script-box" data-category="all restaurante">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-green); font-size: 0.85em;">📱 WhatsApp - Restaurantes</strong>
+                <div class="script-text" onclick="copyScript(this)">Oi! Tudo bem? 😊
+
+Vi que o [NOME DO RESTAURANTE] tem uma comida incrível, mas notei que não está aproveitando o Instagram para atrair mais clientes.
+
+Eu crio posts profissionais usando inteligência artificial por apenas R$50 (5 posts prontos com arte + legenda). 
+
+Topa ver 3 exemplos GRÁTIS que fiz para restaurantes como o seu? É rapidinho! 🍕📸</div>
+            </div>
+            
+            <div class="script-box" data-category="all beleza">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-green); font-size: 0.85em;">📱 WhatsApp - Salões/Barbearias</strong>
+                <div class="script-text" onclick="copyScript(this)">Fala! 👋 
+
+Sou criador de conteúdo digital e notei que o [NOME DO SALÃO] poderia usar uns posts mais profissionais no Instagram. Postagens bonitas atraem MUITO mais clientes!
+
+Faço pacotes de 5 posts por R$50 (arte + legenda + hashtags). Entrega em 24h!
+
+Quer ver exemplos que fiz para salões? 🎨💇</div>
+            </div>
+            
+            <div class="script-box" data-category="all pet">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-green); font-size: 0.85em;">📱 WhatsApp - Pet Shops</strong>
+                <div class="script-text" onclick="copyScript(this)">Oi! 😊🐾
+
+Vi que o [NOME DO PET SHOP] cuida super bem dos animais, mas seu Instagram não mostra isso! Com posts profissionais, você atrai muito mais tutores.
+
+Crio 5 posts prontos (arte + legenda) por apenas R$50 usando IA. Entrega rápida!
+
+Posso fazer 2 exemplos GRÁTIS para você ver? Sem compromisso! 📸</div>
+            </div>
+            
+            <div class="script-box" data-category="all fitness">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-green); font-size: 0.85em;">📱 WhatsApp - Academias</strong>
+                <div class="script-text" onclick="copyScript(this)">Fala! 💪🔥
+
+Notei que a [NOME DA ACADEMIA] tem ótimas instalações mas não está aproveitando o Instagram para lotar as aulas!
+
+Crio posts profissionais com IA por R$50 (5 posts prontos). Inclui arte, legenda motivacional e hashtags estratégicas.
+
+Quer ver exemplos? Faço 1 post GRÁTIS para você testar! 📸</div>
+            </div>
+            
+            <!-- Follow-up Scripts -->
+            <div class="script-box" data-category="all">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-yellow); font-size: 0.85em;">🔄 Follow-up (não respondeu em 2 dias)</strong>
+                <div class="script-text" onclick="copyScript(this)">Oi! Passando só para lembrar 😊
+
+Consigo fazer seus primeiros 3 posts de GRAÇA para você ver a qualidade. Se gostar, a gente fecha o pacote.
+
+Sem compromisso! O que acha? 👍</div>
+            </div>
+            
+            <!-- Closing Scripts -->
+            <div class="script-box" data-category="all">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-green); font-size: 0.85em;">💰 Fechamento de Venda</strong>
+                <div class="script-text" onclick="copyScript(this)">Perfeito! 🎉
+
+O pacote inclui:
+✅ 5 posts profissionais (arte + legenda)
+✅ Entrega em 24 horas
+✅ 1 rodada de alterações grátis
+✅ Conteúdo otimizado para seu negócio
+
+Valor: R$50 (pagamento via PIX)
+
+Posso começar agora mesmo! Me manda:
+📸 3-5 fotos do seu negócio
+🏷️ Seu logo (se tiver)
+📝 Qualquer info importante (promoções, horário, etc.)</div>
+            </div>
+            
+            <!-- Upsell Scripts -->
+            <div class="script-box" data-category="all">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-purple); font-size: 0.85em;">⬆️ Upsell (Pacote Mensal)</strong>
+                <div class="script-text" onclick="copyScript(this)">Que bom que gostou dos posts! 😄
+
+Se quiser, tenho pacotes mensais:
+📦 Básico: 8 posts/mês + 4 stories = R$150/mês
+📦 Profissional: 12 posts/mês + 8 stories + legendas com hashtags = R$250/mês
+📦 Premium: 20 posts/mês + stories + gestão completa = R$400/mês
+
+Assim você não precisa se preocupar com o Instagram! Qual te interessa? 🚀</div>
+            </div>
+            
+            <!-- Site Scripts -->
+            <div class="script-box" data-category="site">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-blue); font-size: 0.85em;">🌐 Venda de Sites</strong>
+                <div class="script-text" onclick="copyScript(this)">Oi! Vi que o [NOME] não tem site próprio. Hoje em dia, 80% dos clientes pesquisam online antes de comprar!
+
+Crio sites profissionais por R$300-500, incluindo:
+✅ Design moderno
+✅ Botão do WhatsApp
+✅ Cardápio/Serviços
+✅ Horário de funcionamento
+✅ Localização
+✅ Otimizado para celular
+
+Entrega em 48h! Quer ver um exemplo? 🌐</div>
+            </div>
+            
+            <div class="script-box" data-category="site">
+                <div class="copy-hint">📋 Clique para copiar</div>
+                <strong style="color: var(--accent-blue); font-size: 0.85em;">🌐 Follow-up de Sites</strong>
+                <div class="script-text" onclick="copyScript(this)">Fala! 😊
+
+Só lembrando que um site profissional passa MUITA credibilidade. Clientes confiam mais em negócios que têm site!
+
+Posso fazer um site de 1 página por R$300, entrega em 2 dias. Inclui:
+- Design moderno
+- Botão WhatsApp
+- Informações completas
+
+Topa? 🚀</div>
+            </div>
+            
+            <div class="tip-box">
+                <strong>📌 Como usar os scripts:</strong>
+                <p>1. Clique no script para copiar automaticamente<br>
+                2. Cole no WhatsApp do cliente<br>
+                3. Personalize com o nome do negócio<br>
+                4. Envie e aguarde a resposta!</p>
+            </div>
+        </div>
+        
+        <!-- Tab 3: Templates -->
+        <div id="templates" class="tab-content">
+            <div class="section-header">
+                <h2>🌐 Templates de Sites</h2>
+            </div>
+            
+            <div class="tip-box">
+                <strong>💡 Como usar:</strong>
+                <p>Escolha um template abaixo, copie o código HTML e hospede GRÁTIS no GitHub Pages ou Netlify. Você pode cobrar R$300-500 por site!</p>
+            </div>
+            
+            <div class="template-grid">
+                <div class="template-card" onclick="showTemplate('restaurante')">
+                    <div class="template-icon">🍕</div>
+                    <div class="template-name">Restaurante</div>
+                    <div class="template-desc">Cardápio + WhatsApp</div>
+                </div>
+                <div class="template-card" onclick="showTemplate('beleza')">
+                    <div class="template-icon">💇</div>
+                    <div class="template-name">Salão/Barbearia</div>
+                    <div class="template-desc">Serviços + Agendamento</div>
+                </div>
+                <div class="template-card" onclick="showTemplate('pet')">
+                    <div class="template-icon">🐾</div>
+                    <div class="template-name">Pet Shop</div>
+                    <div class="template-desc">Serviços + Promoções</div>
+                </div>
+                <div class="template-card" onclick="showTemplate('fitness')">
+                    <div class="template-icon">🏋️</div>
+                    <div class="template-name">Academia</div>
+                    <div class="template-desc">Planos + Horários</div>
+                </div>
+                <div class="template-card" onclick="showTemplate('loja')">
+                    <div class="template-icon">👗</div>
+                    <div class="template-name">Loja de Roupas</div>
+                    <div class="template-desc">Produtos + Contato</div>
+                </div>
+                <div class="template-card" onclick="showTemplate('generico')">
+                    <div class="template-icon">📦</div>
+                    <div class="template-name">Genérico</div>
+                    <div class="template-desc">Multiuso</div>
+                </div>
+            </div>
+            
+            <!-- Template Preview Modal -->
+            <div class="modal" id="templateModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modalTitle">Template</h3>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                    </div>
+                    <div id="modalContent"></div>
+                    <button class="btn btn-primary" onclick="copyTemplateCode()" style="width: 100%; margin-top: 16px;">📋 Copiar Código HTML</button>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-title">🚀 Como Hospedar Site GRÁTIS</div>
+                <div class="roadmap-day">
+                    <div class="day-number">1</div>
+                    <div class="day-content">
+                        <div class="day-title">GitHub Pages (Recomendado)</div>
+                        <ul class="day-tasks">
+                            <li>Crie conta no github.com</li>
+                            <li>Crie repositório: nome-do-cliente.github.io</li>
+                            <li>Upload do arquivo index.html</li>
+                            <li>Site online em 2 minutos!</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="roadmap-day">
+                    <div class="day-number">2</div>
+                    <div class="day-content">
+                        <div class="day-title">Netlify (Mais Fácil)</div>
+                        <ul class="day-tasks">
+                            <li>Acesse netlify.com</li>
+                            <li>Arraste a pasta do site</li>
+                            <li>Pronto! Site online com link gratuito</li>
+                            <li>Pode conectar domínio próprio depois</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="roadmap-day">
+                    <div class="day-number">3</div>
+                    <div class="day-content">
+                        <div class="day-title">Google Sites (Zero Código)</div>
+                        <ul class="day-tasks">
+                            <li>Acesse sites.google.com</li>
+                            <li>Escolha template de negócio</li>
+                            <li>Arraste e solte elementos</li>
+                            <li>Publique com domínio gratuito</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 4: Roadmap -->
+        <div id="roadmap" class="tab-content">
+            <div class="section-header">
+                <h2>📅 Roteiro de 30 Dias</h2>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="roadmapProgress" style="width: 0%"></div>
+            </div>
+            <p style="font-size: 0.8em; color: var(--text-secondary); text-align: center; margin-bottom: 20px;">
+                <span id="progressText">0/30 dias completados</span>
+            </p>
+            
+            <div id="roadmapContent"></div>
+            
+            <div class="tip-box">
+                <strong>🎯 Metas Realistas:</strong>
+                <p>• Semana 1: 1-2 clientes de posts (R$50-100)<br>
+                • Semana 2: 2-3 clientes + 1 site (R$200-600)<br>
+                • Semana 3: 5+ clientes recorrentes (R$500-1000)<br>
+                • Semana 4: 10+ clientes (R$1500-3000/mês)<br>
+                • Mês 2: Escalar com equipe e processos<br>
+                • Mês 3: R$3000-8000/mês consistente</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // Data
+        let prospects = JSON.parse(localStorage.getItem('ls_prospects') || '[]');
+        let revenue = parseInt(localStorage.getItem('ls_revenue') || '0');
+        let completedDays = JSON.parse(localStorage.getItem('ls_completed_days') || '[]');
+        
+        // Current template code
+        let currentTemplateCode = '';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProspects();
+            updateStats();
+            renderRoadmap();
+        });
+        
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // Copy to Clipboard
+        function copyScript(el) {
+            navigator.clipboard.writeText(el.textContent).then(() => {
+                showToast('📋 Script copiado!');
+            });
+        }
+        
+        // Prospects
+        function addProspect() {
+            const name = document.getElementById('prospectName').value.trim();
+            const phone = document.getElementById('prospectPhone').value.trim();
+            const niche = document.getElementById('prospectNiche').value;
+            const notes = document.getElementById('prospectNotes').value.trim();
+            
+            if (!name) {
+                showToast('❌ Digite o nome do negócio!');
+                return;
+            }
+            
+            prospects.push({
+                id: Date.now(),
+                name,
+                phone,
+                niche,
+                notes,
+                status: 'new',
+                date: new Date().toLocaleDateString('pt-BR')
+            });
+            
+            saveProspects();
+            renderProspects();
+            updateStats();
+            
+            // Clear form
+            document.getElementById('prospectName').value = '';
+            document.getElementById('prospectPhone').value = '';
+            document.getElementById('prospectNotes').value = '';
+            
+            showToast('✅ Alvo adicionado!');
+        }
+        
+        function updateProspectStatus(id, status) {
+            const prospect = prospects.find(p => p.id === id);
+            if (prospect) {
+                prospect.status = status;
+                if (status === 'client') {
+                    revenue += 50;
+                    localStorage.setItem('ls_revenue', revenue.toString());
+                }
+                saveProspects();
+                renderProspects();
+                updateStats();
+            }
+}
+        
+        function deleteProspect(id) {
+            prospects = prospects.filter(p => p.id !== id);
+            saveProspects();
+            renderProspects();
+            updateStats();
+        }
+        
+        function saveProspects() {
+            localStorage.setItem('ls_prospects', JSON.stringify(prospects));
+        }
+        
+        let currentFilter = 'all';
+        function filterProspects(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tags .filter-tag').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderProspects();
+        }
+        
+        function renderProspects() {
+            const list = document.getElementById('prospectList');
+            const filtered = currentFilter === 'all' ? prospects : prospects.filter(p => p.status === currentFilter);
+            
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">${currentFilter === 'all' ? '📋' : currentFilter === 'new' ? '🆕' : currentFilter === 'contacted' ? '📱' : '✅'}</div>
+                        <p>${currentFilter === 'all' ? 'Nenhum alvo ainda. Adicione seu primeiro negócio!' : 'Nenhum alvo nesta categoria.'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const statusLabels = {
+                'new': { text: '🆕 Novo', class: 'status-new' },
+                'contacted': { text: '📱 Contatado', class: 'status-contacted' },
+                'client': { text: '✅ Cliente', class: 'status-client' },
+                'lost': { text: '❌ Perdido', class: 'status-lost' }
+            };
+            
+            const nicheIcons = {
+                'restaurante': '🍕',
+                'beleza': '💇',
+                'pet': '🐾',
+                'fitness': '🏋️',
+                'loja': '👗',
+                'construcao': '🔨',
+                'saude': '🏥',
+                'outro': '📦'
+            };
+            
+            list.innerHTML = filtered.map(p => `
+                <div class="client-item">
+                    <div class="client-info">
+                        <div class="client-name">${nicheIcons[p.niche] || '📦'} ${p.name}</div>
+                        <div class="client-meta">
+                            ${p.phone ? '📱 ' + p.phone + ' | ' : ''}Adicionado em ${p.date}
+                            ${p.notes ? '<br>📝 ' + p.notes : ''}
+                        </div>
+                    </div>
+                    <span class="client-status ${statusLabels[p.status].class}">${statusLabels[p.status].text}</span>
+                    <div style="display: flex; gap: 4px; margin-left: 8px;">
+                        ${p.status === 'new' ? '<button class="btn btn-sm btn-primary" onclick="updateProspectStatus(' + p.id + ', \'contacted\')">📱</button>' : ''}
+                        ${p.status === 'contacted' ? '<button class="btn btn-sm btn-primary" onclick="updateProspectStatus(' + p.id + ', \'client\')">✅</button>' : ''}
+                        <button class="btn btn-sm btn-secondary" onclick="deleteProspect(${p.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateStats() {
+            document.getElementById('statProspects').textContent = prospects.length;
+            document.getElementById('statContacted').textContent = prospects.filter(p => p.status === 'contacted').length;
+            document.getElementById('statClients').textContent = prospects.filter(p => p.status === 'client').length;
+            document.getElementById('statRevenue').textContent = 'R$' + revenue;
+        }
+        
+        // Templates
+        const templates = {
+            restaurante: {
+                title: '🍕 Template Restaurante',
+                code: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[NOME DO RESTAURANTE]</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; }
+        .container { max-width: 800px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #dc2626, #f59e0b); padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2.2em; margin-bottom: 8px; }
+        header p { font-size: 1.1em; opacity: 0.9; }
+        .section { padding: 30px 20px; }
+        .menu-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; }
+        .menu-item:last-child { border: none; }
+        .whatsapp-btn { display: inline-block; background: #25d366; color: #fff; padding: 15px 30px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 1.1em; margin: 20px 0; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .info-card { background: #2a2a2a; padding: 15px; border-radius: 10px; text-align: center; }
+        .info-card h3 { color: #f59e0b; margin-bottom: 8px; }
+        footer { text-align: center; padding: 20px; background: #111; font-size: 0.9em; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍕 [NOME DO RESTAURANTE]</h1>
+            <p>O melhor sabor da cidade!</p>
+        </header>
+        
+        <div class="section">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #f59e0b;">📋 Cardápio</h2>
+            <div class="menu-item"><span>🍕 Pizza Margherita</span><span>R$ 35</span></div>
+            <div class="menu-item"><span>🍕 Pizza Calabresa</span><span>R$ 38</span></div>
+            <div class="menu-item"><span>🥗 Salada Caesar</span><span>R$ 28</span></div>
+            <div class="menu-item"><span>🍝 Massa Carbonara</span><span>R$ 42</span></div>
+            <div class="menu-item"><span>🥩 Picanha na Brasa</span><span>R$ 65</span></div>
+            <div class="menu-item"><span>🍔 Hambúrguer Artesanal</span><span>R$ 32</span></div>
+        </div>
+        
+        <div class="section" style="text-align: center; background: #222;">
+            <h2 style="color: #f59e0b; margin-bottom: 15px;">📞 Faça seu Pedido</h2>
+            <a href="https://wa.me/55SEUNUMERO" class="whatsapp-btn">💬 Pedir pelo WhatsApp</a>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>🕐 Horário</h3>
+                    <p>Ter-Dom: 18h-00h</p>
+                </div>
+                <div class="info-card">
+                    <h3>📍 Endereço</h3>
+                    <p>Rua Exemplo, 123</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 [NOME DO RESTAURANTE] - Todos os direitos reservados</p>
+        </footer>
+    </div>
+</body>
+</html>`
+            },
+            beleza: {
+                title: '💇 Template Salão/Barbearia',
+                code: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[NOME DO SALÃO]</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; }
+        header { background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2em; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .services { display: grid; gap: 15px; margin: 20px 0; }
+        .service { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #ec4899; }
+        .service h3 { color: #ec4899; margin-bottom: 8px; }
+        .whatsapp-btn { display: block; background: #25d366; color: #fff; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold; text-align: center; margin: 20px 0; }
+        .promo { background: #222; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; border: 2px dashed #8b5cf6; }
+        footer { text-align: center; padding: 20px; color: #888; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>💇 [NOME DO SALÃO]</h1>
+        <p>Transforme seu visual com profissionais!</p>
+    </header>
+    <div class="container">
+        <div class="promo">
+            <h2 style="color: #8b5cf6;">🔥 PROMOÇÃO</h2>
+            <p>Corte + Escova = R$ 80 (normal R$ 100)</p>
+        </div>
+        <h2 style="color: #ec4899; margin: 20px 0;">✨ Nossos Serviços</h2>
+        <div class="services">
+            <div class="service"><h3>💇 Corte Feminino</h3><p>A partir de R$ 60</p></div>
+            <div class="service"><h3>✂️ Corte Masculino</h3><p>A partir de R$ 40</p></div>
+            <div class="service"><h3>🎨 Coloração</h3><p>A partir de R$ 120</p></div>
+            <div class="service"><h3>💅 Manicure & Pedicure</h3><p>A partir de R$ 45</p></div>
+            <div class="service"><h3>✨ Tratamentos Capilares</h3><p>A partir de R$ 80</p></div>
+        </div>
+        <a href="https://wa.me/55SEUNUMERO" class="whatsapp-btn">📲 Agende pelo WhatsApp</a>
+        <div style="text-align: center; color: #888;">
+            <p>📍 Rua Exemplo, 123</p>
+            <p>🕐 Seg-Sáb: 9h-20h</p>
+        </div>
+    </div>
+    <footer>© 2025 [NOME DO SALÃO]</footer>
+</body>
+</html>`
+            },
+            pet: {
+                title: '🐾 Template Pet Shop',
+                code: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[NOME DO PET SHOP]</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; }
+        header { background: linear-gradient(135deg, #10b981, #3b82f6); padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2em; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .services { display: grid; gap: 15px; margin: 20px 0; }
+        .service { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #10b981; }
+        .service h3 { color: #10b981; margin-bottom: 8px; }
+        .whatsapp-btn { display: block; background: #25d366; color: #fff; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold; text-align: center; margin: 20px 0; }
+        .promo { background: #222; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; border: 2px dashed #10b981; }
+        footer { text-align: center; padding: 20px; color: #888; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🐾 [NOME DO PET SHOP]</h1>
+        <p>Cuidando do seu melhor amigo!</p>
+    </header>
+    <div class="container">
+        <div class="promo">
+            <h2 style="color: #10b981;">🎁 PRIMEIRA VISITA</h2>
+            <p>Banho completo com 15% OFF + Brinde!</p>
+        </div>
+        <h2 style="color: #10b981; margin: 20px 0;">🐶 Nossos Serviços</h2>
+        <div class="services">
+            <div class="service"><h3>🛁 Banho & Tosa</h3><p>A partir de R$ 50</p></div>
+            <div class="service"><h3>🏥 Veterinário</h3><p>Consulta: R$ 80</p></div>
+            <div class="service"><h3>💉 Vacinação</h3><p>A partir de R$ 60</p></div>
+            <div class="service"><h3>🦴 Pet Hotel</h3><p>Diária: R$ 70</p></div>
+            <div class="service"><h3>🛒 Rações Premium</h3><p>Com 10% OFF no site</p></div>
+        </div>
+        <a href="https://wa.me/55SEUNUMERO" class="whatsapp-btn">📲 Fale Conosco</a>
+        <div style="text-align: center; color: #888;">
+            <p>📍 Rua Exemplo, 123</p>
+            <p>🕐 Seg-Sáb: 8h-20h | Dom: 9h-13h</p>
+        </div>
+    </div>
+    <footer>© 2025 [NOME DO PET SHOP]</footer>
+</body>
+</html>`
+            },
+            fitness: {
+                title: '🏋️ Template Academia',
+                code: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[NOME DA ACADEMIA]</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; }
+        header { background: linear-gradient(135deg, #dc2626, #f59e0b); padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2em; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .plans { display: grid; gap: 15px; margin: 20px 0; }
+        .plan { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #f59e0b; }
+        .plan h3 { color: #f59e0b; margin-bottom: 8px; }
+        .plan .price { font-size: 2em; font-weight: bold; color: #dc2626; }
+        .whatsapp-btn { display: block; background: #25d366; color: #fff; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold; text-align: center; margin: 20px 0; }
+        .promo { background: #222; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; border: 2px dashed #dc2626; }
+        footer { text-align: center; padding: 20px; color: #888; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏋️ [NOME DA ACADEMIA]</h1>
+        <p>Transforme seu corpo e sua vida!</p>
+    </header>
+    <div class="container">
+        <div class="promo">
+            <h2 style="color: #dc2626;">🔥 MATRÍCULA GRÁTIS</h2>
+            <p>Este mês! Não perca essa oportunidade!</p>
+        </div>
+        <h2 style="color: #f59e0b; margin: 20px 0;">💪 Nossos Planos</h2>
+        <div class="plans">
+            <div class="plan"><h3>📅 Plano Mensal</h3><div class="price">R$ 89,90</div><p>/mês</p></div>
+            <div class="plan"><h3>📆 Plano Trimestral</h3><div class="price">R$ 79,90</div><p>/mês</p></div>
+            <div class="plan"><h3>📊 Plano Semestral</h3><div class="price">R$ 69,90</div><p>/mês</p></div>
+            <div class="plan"><h3>🏆 Plano Anual</h3><div class="price">R$ 59,90</div><p>/mês</p></div>
+        </div>
+        <a href="https://wa.me/55SEUNUMERO" class="whatsapp-btn">📲 Matricule-se Agora</a>
+        <div style="text-align: center; color: #888;">
+            <p>📍 Rua Exemplo, 123</p>
+            <p>🕐 Seg-Sex: 6h-23h | Sáb: 8h-18h | Dom: 8h-12h</p>
+        </div>
+    </div>
+    <footer>© 2025 [NOME DA ACADEMIA]</footer>
+</body>
+</html>`
+            },
+            loja: {
+                title: '👗 Template Loja de Roupas',
+                code: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[NOME DA LOJA]</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; }
+        header { background: linear-gradient(135deg, #ec4899, #8b5cf6); padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2em; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+        .product { background: #1a1a1a; padding: 20px; border-radius: 12px; text-align: center; }
+        .product h3 { color: #ec4899; margin-bottom: 8px; }
+        .product .price { font-size: 1.5em; font-weight: bold; color: #8b5cf6; }
+        .whatsapp-btn { display: block; background: #25d366; color: #fff; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold; text-align: center; margin: 20px 0; }
+        .promo { background: #222; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; border: 2px dashed #ec4899; }
+        footer { text-align: center; padding: 20px; color: #888; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>👗 [NOME DA LOJA]</h1>
+        <p>Moda que combina com você!</p>
+    </header>
+    <div class="container">
+        <div class="promo">
+            <h2 style="color: #ec4899;">🛍️ LIQUIDAÇÃO</h2>
+            <p>Até 50% OFF em peças selecionadas!</p>
+        </div>
+        <h2 style="color: #8b5cf6; margin: 20px 0;">✨ Novidades</h2>
+        <div class="products">
+            <div class="product"><h3>👚 Blusa Floral</h3><div class="price">R$ 79,90</div></div>
+            <div class="product"><h3>👖 Calça Jeans</h3><div class="price">R$ 129,90</div></div>
+            <div class="product"><h3>👗 Vestido Midi</h3><div class="price">R$ 149,90</div></div>
+            <div class="product"><h3>👜 Bolsa Couro</h3><div class="price">R$ 199,90</div></div>
+        </div>
+        <a href="https://wa.me/55SEUNUMERO" class="whatsapp-btn">📲 Compre pelo WhatsApp</a>
+        <div style="text-align: center; color: #888;">
+            <p>📍 Rua Exemplo, 123 - Shopping XYZ</p>
+            <p>🕐 Seg-Sáb: 10h-22h</p>
+        </div>
+    </div>
+    <footer>© 2025 [NOME DA LOJA]</footer>
+</body>
+</html>`
+            },
+            generico: {
+                title: '📦 Template Genérico',
+                code: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[NOME DO NEGÓCIO]</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; }
+        header { background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2em; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .services { display: grid; gap: 15px; margin: 20px 0; }
+        .service { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #3b82f6; }
+        .service h3 { color: #3b82f6; margin-bottom: 8px; }
+        .whatsapp-btn { display: block; background: #25d366; color: #fff; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold; text-align: center; margin: 20px 0; }
+        .promo { background: #222; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; border: 2px dashed #3b82f6; }
+        footer { text-align: center; padding: 20px; color: #888; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📦 [NOME DO NEGÓCIO]</h1>
+        <p>Soluções profissionais para você!</p>
+    </header>
+    <div class="container">
+        <div class="promo">
+            <h2 style="color: #3b82f6;">🔥 OFERTA ESPECIAL</h2>
+            <p>Condições exclusivas para novos clientes!</p>
+        </div>
+        <h2 style="color: #8b5cf6; margin: 20px 0;">✨ Nossos Serviços</h2>
+        <div class="services">
+            <div class="service"><h3>📦 Serviço 1</h3><p>Descrição do serviço</p></div>
+            <div class="service"><h3>📦 Serviço 2</h3><p>Descrição do serviço</p></div>
+            <div class="service"><h3>📦 Serviço 3</h3><p>Descrição do serviço</p></div>
+        </div>
+        <a href="https://wa.me/55SEUNUMERO" class="whatsapp-btn">📲 Fale Conosco</a>
+        <div style="text-align: center; color: #888;">
+            <p>📍 Rua Exemplo, 123</p>
+            <p>🕐 Horário de funcionamento</p>
+        </div>
+    </div>
+    <footer>© 2025 [NOME DO NEGÓCIO]</footer>
+</body>
+</html>`
+            }
+        };
+        
+        function showTemplate(type) {
+            const template = templates[type];
+            currentTemplateCode = template.code;
+            document.getElementById('modalTitle').textContent = template.title;
+            document.getElementById('modalContent').innerHTML = `
+                <div class="website-preview">
+                    ${template.code.replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 500)}...
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.8em; margin-top: 10px;">
+                    Copie o código completo clicando no botão abaixo. Substitua [NOME DO NEGÓCIO] e outras informações antes de publicar.
+                </p>
+            `;
+            document.getElementById('templateModal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('templateModal').classList.remove('active');
+        }
+        
+        function copyTemplateCode() {
+            navigator.clipboard.writeText(currentTemplateCode).then(() => {
+                showToast('📋 Código HTML copiado!');
+            });
+        }
+        
+        // Scripts Filter
+        function filterScripts(category) {
+            document.querySelectorAll('#scripts .script-box').forEach(box => {
+                if (category === 'all' || box.dataset.category.includes(category)) {
+                    box.style.display = 'block';
+                } else {
+                    box.style.display = 'none';
+                }
+            });
+            document.querySelectorAll('#scripts .filter-tag').forEach(tag => tag.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        // Roadmap
+        function renderRoadmap() {
+            const roadmap = [
+                { day: 1, title: "Fundação", tasks: ["Criar conta no Canva (grátis)", "Baixar ChatGPT no iPhone", "Definir seu nome de negócio", "Criar WhatsApp Business"] },
+                { day: 2, title: "Portfólio", tasks: ["Criar 5 posts de exemplo", "Salvar como PDF/imagem", "Escolher nicho principal", "Preparar script de abordagem"] },
+                { day: 3, title: "Prospecção", tasks: ["Listar 20 negócios no Google Maps", "Verificar Instagram de cada um", "Anotar 10 com presença fraca", "Adicionar na planilha"] },
+                { day: 4, title: "Primeiras Abordagens", tasks: ["Enviar 15 mensagens WhatsApp", "Enviar 10 DMs Instagram", "Usar scripts prontos", "Registrar na planilha"] },
+                { day: 5, title: "Follow-up", tasks: ["Responder interessados", "Enviar exemplos de portfólio", "Fechar primeiro cliente", "Começar trabalho"] },
+                { day: 6, title: "Entrega", tasks: ["Criar posts para cliente", "Usar IA para textos", "Montar artes no Canva", "Entregar em 24h"] },
+                { day: 7, title: "Escala", tasks: ["Pedir indicação ao cliente", "Prospectar mais 20", "Ajustar preços", "Criar Instagram próprio"] },
+                { day: 8, title: "Consolidação", tasks: ["Avaliar resultados", "Otimizar scripts", "Expandir nichos", "Criar pacotes mensais"] },
+                { day: 9, title: "Sites", tasks: ["Estudar Google Sites/Carrd", "Criar template de site", "Oferecer para clientes", "Preço: R$300-500"] },
+                { day: 10, title: "Diversificação", tasks: ["Criar vídeos curtos", "Oferecer Reels/TikTok", "Preço: R$30-50/vídeo", "Expandir serviços"] },
+                { day: 11, title: "Processos", tasks: ["Criar templates reutilizáveis", "Automatizar com IA", "Reduzir tempo de entrega", "Aumentar margem"] },
+                { day: 12, title: "Marketing", tasks: ["Postar no seu Instagram", "Mostrar cases de sucesso", "Usar hashtags locais", "Atrair orgânicos"] },
+                { day: 13, title: "Prospecção 2", tasks: ["Listar mais 30 negócios", "Focar em novos nichos", "Usar indicações", "Follow-up antigos"] },
+                { day: 14, title: "Análise", tasks: ["Revisar métricas", "Calcular ROI", "Ajustar estratégia", "Planejar semana 3"] },
+                { day: 15, title: "Meio do Caminho", tasks: ["Celebrar conquistas", "Ajustar preços", "Criar pacotes premium", "Fidelizar clientes"] },
+                { day: 16, title: "Expansão", tasks: ["Adicionar novo serviço", "Criar site para cliente", "Oferecer gestão completa", "Aumentar ticket médio"] },
+                { day: 17, title: "Redes Sociais", tasks: ["Postar 3x na semana", "Usar IA para conteúdo", "Engajar com seguidores", "Criar comunidade"] },
+                { day: 18, title: "Parcerias", tasks: ["Contatar influenciadores locais", "Propor troca de serviços", "Criar indicações mútuas", "Expandir rede"] },
+                { day: 19, title: "Otimização", tasks: ["Analisar melhores scripts", "Focar no que funciona", "Eliminar ineficiências", "Automatizar mais"] },
+                { day: 20, title: "Escala", tasks: ["Contratar assistente (opcional)", "Aumentar capacidade", "Criar processos padrão", "Treinar equipe"] },
+                { day: 21, title: "Consolidação", tasks: ["Revisar todos os clientes", "Pedir depoimentos", "Criar cases de sucesso", "Usar como marketing"] },
+                { day: 22, title: "Novos Canais", tasks: ["Criar perfil no LinkedIn", "Cadastrar em freelancer", "Usar plataformas online", "Diversificar renda"] },
+                { day: 23, title: "Inovação", tasks: ["Testar IA mais avançada", "Criar conteúdo diferente", "Explorar novos formatos", "Ficar à frente"] },
+                { day: 24, title: "Prospecção 3", tasks: ["Listar 50 novos alvos", "Focar em clientes maiores", "Ajustar abordagem", "Ser mais assertivo"] },
+                { day: 25, title: "Fechamento", tasks: ["Follow-up em todos", "Oferecer desconto primeiro", "Criar urgência", "Fechar contratos"] },
+                { day: 26, title: "Entrega Premium", tasks: ["Superar expectativas", "Entregar antes do prazo", "Adicionar bônus", "Gerar indicações"] },
+                { day: 27, title: "Análise Final", tasks: ["Calcular receita total", "Avaliar crescimento", "Identificar gargalos", "Planejar ajustes"] },
+                { day: 28, title: "Otimização", tasks: ["Refinar processos", "Atualizar portfólio", "Melhorar scripts", "Aumentar eficiência"] },
+                { day: 29, title: "Escala Final", tasks: ["Definir meta mês 2", "Criar plano de ação", "Preparar equipe", "Automatizar tudo"] },
+                { day: 30, title: "Celebração", tasks: ["Comemorar conquistas", "Revisar aprendizado", "Planejar próximo mês", "Manter consistência"] }
+            ];
+            
+            const content = document.getElementById('roadmapContent');
+            content.innerHTML = roadmap.map(r => `
+                <div class="roadmap-day">
+                    <div class="day-number ${r.day % 7 === 0 || r.day % 7 === 6 ? 'weekend' : ''}">${r.day}</div>
+                    <div class="day-content">
+                        <div class="day-title">${r.title}</div>
+                        <ul class="day-tasks">
+                            ${r.tasks.map(t => `
+                                <li class="${completedDays.includes(r.day + '-' + t) ? 'done' : ''}" onclick="toggleTask(${r.day}, '${t}')">
+                                    ${t}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+            
+            updateProgress();
+        }
+        
+        function toggleTask(day, task) {
+            const key = day + '-' + task;
+            const index = completedDays.indexOf(key);
+            if (index > -1) {
+                completedDays.splice(index, 1);
+            } else {
+                completedDays.push(key);
+            }
+            localStorage.setItem('ls_completed_days', JSON.stringify(completedDays));
+            renderRoadmap();
+        }
+        
+        function updateProgress() {
+            const total = 120; // 30 days * 4 tasks average
+            const done = completedDays.length;
+            const percent = Math.min((done / total) * 100, 100);
+            document.getElementById('roadmapProgress').style.width = percent + '%';
+            document.getElementById('progressText').textContent = `${done}/${total} tarefas completadas`;
+        }
+        
+        // Close modal on outside click
+        document.getElementById('templateModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a099581c4d1f6348',t:'MTc4MTEwNDY1OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
