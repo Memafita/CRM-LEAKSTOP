@@ -610,6 +610,19 @@
         <div class="header">
             <h1>🚀 Leak Stop - Central de Comando</h1>
             <p>Seu negócio de IA começa AGORA</p>
+            <div style="display:flex;gap:6px;justify-content:center;align-items:center;margin-top:6px;font-size:12px">
+                <span id="syncStatus">● Carregando...</span>
+                <button onclick="configurarToken()" style="background:#1a1a1a;border:1px solid #2a2a2a;color:#f59e0b;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px">⚙️ Token</button>
+                <button onclick="sincronizar()" style="background:#1a1a1a;border:1px solid #2a2a2a;color:#10b981;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px">🔄 Sync</button>
+            </div>
+            <div id="tokenModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.style.display='none'">
+                <div style="background:#1a1a1a;border-radius:14px;padding:24px;max-width:380px;width:100%">
+                    <h3 style="color:#f59e0b;margin-bottom:8px">🔑 Token de acesso</h3>
+                    <p style="font-size:12px;color:#888;margin-bottom:12px">É o ADMIN_TOKEN que você criou no Netlify. Permite sincronizar seus dados na nuvem (multi-dispositivo) e acessar o painel admin.</p>
+                    <input id="tokenInput" placeholder="cole seu token aqui" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;padding:12px;color:#fff;margin-bottom:8px">
+                    <button onclick="salvarToken()" style="width:100%;background:#f59e0b;color:#000;border:none;border-radius:8px;padding:13px;font-weight:700;cursor:pointer">Salvar e sincronizar</button>
+                </div>
+            </div>
         </div>
         
         <!-- Stats -->
@@ -627,9 +640,12 @@
                 <div class="stat-label">Clientes</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="statRevenue">R$0</div>
+                <div class="stat-value" id="statRevenue">R$ 0,00</div>
                 <div class="stat-label">Receita</div>
             </div>
+        </div>
+        <div style="text-align:center; margin:10px 0;">
+            <button class="btn btn-sm btn-secondary" onclick="exportarCSV()">⬇️ Exportar prospectos (CSV)</button>
         </div>
         
         <!-- Navigation -->
@@ -970,8 +986,79 @@ Topa? 🚀</div>
     <div class="toast" id="toast"></div>
     
     <script>
+        // ===== utilidades =====
+        function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+        function formatBRL(v){ return "R$ " + Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2}); }
+        // ===== SYNC NA NUVEM (offline-first, com fallback) =====
+        const WS_KEY = "ls_ws_token";
+        function getWS(){ return localStorage.getItem(WS_KEY) || ""; }
+        function setWS(t){ localStorage.setItem(WS_KEY, t.trim()); }
+        function statusSync(msg, cor){
+            const el = document.getElementById("syncStatus");
+            if(el){ el.textContent = msg; el.style.color = cor || "#888"; }
+        }
+        async function sincronizar(){
+            const token = getWS();
+            if(!token){ statusSync("Configure seu token (⚙️) para sincronizar", "#f59e0b"); return; }
+            statusSync("Sincronizando...", "#3b82f6");
+            try{
+                const r = await fetch("/.netlify/functions/sync-prospectos",{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+                    body: JSON.stringify({
+                        prospectos: prospects.map(p=>({id:p.id,name:p.name,phone:p.phone,niche:p.niche,notes:p.notes,status:p.status,value:p.value||0,date:p.date,atualizado_em:p.atualizado_em||new Date().toISOString()})),
+                        receita: revenue,
+                        dias_completos: completedDays
+                    })
+                });
+                if(!r.ok) throw new Error("HTTP "+r.status);
+                const d = await r.json();
+                if(d.prospectos){
+                    // merge: servidor e a fonte de verdade, mas mantem locais se mais novos
+                    const serverIds = {};
+                    d.prospectos.forEach(sp=>{
+                        serverIds[sp.id] = true;
+                        const local = prospects.find(p=>p.id===sp.id);
+                        if(!local || !local.atualizado_em || new Date(sp.atualizado_em) >= new Date(local.atualizado_em)){
+                            const idx = prospects.findIndex(p=>p.id===sp.id);
+                            const row = {id:sp.id,name:sp.nome,phone:sp.telefone,niche:sp.niche,notes:sp.notas,status:sp.status,value:Number(sp.valor)||0,date:sp.data,atualizado_em:sp.atualizado_em};
+                            if(idx>=0) prospects[idx]=row; else prospects.push(row);
+                        }
+                    });
+                    // remove locais que foram excluidos no servidor
+                    prospects = prospects.filter(p=>serverIds[p.id]);
+                }
+                if(typeof d.receita === "number"){ revenue = d.receita; localStorage.setItem('ls_revenue', revenue.toString()); }
+                if(Array.isArray(d.dias_completos)){ completedDays = d.dias_completos; localStorage.setItem('ls_completed_days', JSON.stringify(completedDays)); }
+                saveProspects(); renderProspects(); updateStats();
+                if(typeof renderRoadmap === "function") renderRoadmap();
+                statusSync("✓ Sincronizado " + new Date().toLocaleTimeString("pt-BR"), "#10b981");
+            }catch(e){
+                statusSync("Offline — salvo local (sincroniza depois)", "#888");
+                console.error("sync:", e);
+            }
+        }
+
+        function configurarToken(){ const m=document.getElementById("tokenModal"); document.getElementById("tokenInput").value=getWS(); m.style.display="flex"; }
+        function salvarToken(){ setWS(document.getElementById("tokenInput").value); document.getElementById("tokenModal").style.display="none"; sincronizar(); }
+
+        function exportarCSV(){
+            if(!prospects.length){ showToast("Nada para exportar ainda."); return; }
+            const head = "Nome,Telefone,Nicho,Status,Notas,Adicionado em\n";
+            const rows = prospects.map(p => [p.name,p.phone||"",p.niche,p.status,p.notes||"",p.date]
+                .map(c => '"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\n");
+            const csv = "\uFEFF" + head + rows;
+            const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "leak-stop-prospectos-" + new Date().toISOString().slice(0,10) + ".csv";
+            a.click();
+            showToast("CSV exportado!");
+        }
+
         // Data
         let prospects = JSON.parse(localStorage.getItem('ls_prospects') || '[]');
+        window.addEventListener("load", function(){ setTimeout(sincronizar, 1500); }); // puxa do servidor ao abrir
         let revenue = parseInt(localStorage.getItem('ls_revenue') || '0');
         let completedDays = JSON.parse(localStorage.getItem('ls_completed_days') || '[]');
         
@@ -1047,8 +1134,13 @@ Topa? 🚀</div>
             if (prospect) {
                 prospect.status = status;
                 if (status === 'client') {
-                    revenue += 50;
+                    const v = prompt("Qual o valor fechado com este cliente? (R$)", "50");
+                    const valor = parseFloat(String(v).replace(/[^0-9,.]/g,"").replace(".","").replace(",","."));
+                    const final = (isNaN(valor) || valor <= 0) ? 50 : valor;
+                    prospect.value = final;
+                    revenue += final;
                     localStorage.setItem('ls_revenue', revenue.toString());
+                    showToast("Cliente! +" + formatBRL(final));
                 }
                 saveProspects();
                 renderProspects();
@@ -1065,6 +1157,8 @@ Topa? 🚀</div>
         
         function saveProspects() {
             localStorage.setItem('ls_prospects', JSON.stringify(prospects));
+            if(window._syncTimer) clearTimeout(window._syncTimer);
+            window._syncTimer = setTimeout(sincronizar, 2000); // sincroniza 2s apos ultima edicao
         }
         
         let currentFilter = 'all';
@@ -1110,10 +1204,10 @@ Topa? 🚀</div>
             list.innerHTML = filtered.map(p => `
                 <div class="client-item">
                     <div class="client-info">
-                        <div class="client-name">${nicheIcons[p.niche] || '📦'} ${p.name}</div>
+                        <div class="client-name">${nicheIcons[p.niche] || '📦'} ${esc(p.name)}</div>
                         <div class="client-meta">
-                            ${p.phone ? '📱 ' + p.phone + ' | ' : ''}Adicionado em ${p.date}
-                            ${p.notes ? '<br>📝 ' + p.notes : ''}
+                            ${p.phone ? '📱 ' + esc(p.phone) + ' | ' : ''}Adicionado em ${esc(p.date)}
+                            ${p.notes ? '<br>📝 ' + esc(p.notes) : ''}
                         </div>
                     </div>
                     <span class="client-status ${statusLabels[p.status].class}">${statusLabels[p.status].text}</span>
@@ -1130,7 +1224,7 @@ Topa? 🚀</div>
             document.getElementById('statProspects').textContent = prospects.length;
             document.getElementById('statContacted').textContent = prospects.filter(p => p.status === 'contacted').length;
             document.getElementById('statClients').textContent = prospects.filter(p => p.status === 'client').length;
-            document.getElementById('statRevenue').textContent = 'R$' + revenue;
+            document.getElementById('statRevenue').textContent = formatBRL(revenue);
         }
         
         // Templates
@@ -1567,6 +1661,10 @@ Topa? 🚀</div>
         document.getElementById('templateModal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
+        // Service Worker (offline)
+        if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+            window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+        }
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a099581c4d1f6348',t:'MTc4MTEwNDY1OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
